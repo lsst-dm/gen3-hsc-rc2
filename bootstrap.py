@@ -4,10 +4,11 @@ import sqlite3
 import shutil
 import os
 
-import lsst.log
+import lsst.log.utils
 from lsst.obs.base.gen3 import BootstrapRepoTask, BootstrapRepoInputs
 from lsst.obs.subaru.gen3.hsc import HyperSuprimeCam
 from lsst.daf.butler import Butler
+from lsst.daf.persistence import Butler as Butler2
 
 VISITS = {
     9615: {
@@ -101,20 +102,14 @@ GEN2_RAW_ROOT = "/datasets/hsc/repo"
 GEN2_CALIB_ROOT = "/datasets/hsc/repo/CALIB"
 REFCAT_ROOT = "/datasets/refcats/htm/v1"
 BRIGHT_OBJECT_MASK_ROOT = GEN2_RAW_ROOT
-RAW_TEMPLATE = "%(field)s/%(dateObs)s/%(pointing)05d/%(filter)s/HSC-%(visit)07d-%(ccd)03d.fits"
 
 
 def computeFilesForVisits(visits):
-    db = sqlite3.connect(os.path.join(GEN2_RAW_ROOT, "registry.sqlite3"))
-    db.row_factory = sqlite3.Row
-    for visit in visits:
-        row = db.execute("SELECT field, dateObs, pointing, filter FROM raw WHERE visit=? AND ccd=40",
-                         (visit,)).fetchone()
-        for ccd in range(104):
-            yield os.path.join(GEN2_RAW_ROOT,
-                               RAW_TEMPLATE % dict(field=row["field"], dateObs=row["dateObs"],
-                                                   pointing=row["pointing"], filter=row["filter"],
-                                                   visit=visit, ccd=ccd))
+    with lsst.log.utils.temporaryLogLevel("CameraMapper", lsst.log.Log.WARN):
+        butler = Butler2(GEN2_RAW_ROOT)
+        for visit in visits:
+            for ccd in range(104):
+                yield butler.get("raw_filename", visit=visit, ccd=ccd)[0]
 
 
 def configureLogging():
