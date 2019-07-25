@@ -1,2 +1,4 @@
-# No config overrides necessary for this Gen3-only task;
-# this file present for consistency only.
+from lsst.obs.subaru.gen3.hsc import HyperSuprimeCam
+HyperSuprimeCam().applyConfigOverrides("deblendCoaddSourcesSingle", config)
+
+config.singleBandDeblend.propagateAllPeaks=True
