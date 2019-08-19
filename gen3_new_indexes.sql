@@ -1,0 +1,13 @@
+  create index dataset_collection_idx03 on dataset_collection (dataset_id, collection, dataset_ref_hash);
+  create index dataset_idx05 on dataset (dataset_type_name, dataset_id, instrument, detector, exposure);
+  create index dataset_idx06 on dataset (dataset_type_name, instrument, physical_filter, calibration_label, dataset_id);
+  create index dataset_idx07 on dataset (dataset_type_name, skypix, instrument, physical_filter, calibration_label, dataset_id);
+  create index dataset_idx09 on dataset (dataset_type_name, tract, skypix, instrument, physical_filter, calibration_label, dataset_id, run_id, quantum_id, dataset_ref_hash, abstract_filter, detector, visit, exposure, skymap, patch, label);
+  create index dataset_idx10 on dataset (dataset_type_name, dataset_id, instrument, detector, exposure, tract, skypix, physical_filter, calibration_label, run_id, quantum_id, dataset_ref_hash, abstract_filter, visit, skymap, patch, label);
+  create index dataset_idx11 on dataset (dataset_type_name, instrument, detector, calibration_label);
+  create index dataset_idx12 on dataset (dataset_type_name, instrument, detector, calibration_label, dataset_id);
+  create index exposure_idx01 on exposure (instrument, exposure, datetime_begin, datetime_end);
+  create index patch_skypix_join_idx04 on patch_skypix_join (tract, skymap, patch, skypix);
+  create index physical_filter_idx01 on physical_filter (instrument, physical_filter, abstract_filter);
+  create index visit_detector_skypix_join_idx01 on visit_detector_skypix_join (skypix, detector, visit, instrument);
+  create index visit_idx01 on visit (instrument, visit, physical_filter);
