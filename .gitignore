@@ -1,1 +1,5 @@
 repo*
+profiling*
+scratch*
+.ipynb_checkpoints*
+__pycache__*
