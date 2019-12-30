@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-import sqlite3
+from __future__ import annotations
+
 import shutil
 import os
+from typing import List
 
 import lsst.log.utils
-from lsst.obs.base.gen3 import BootstrapRepoTask, BootstrapRepoInputs
+from lsst.obs.base.gen2to3 import ConvertRepoTask
 from lsst.obs.subaru.gen3.hsc import HyperSuprimeCam
 from lsst.daf.butler import Butler
-from lsst.daf.persistence import Butler as Butler2
 
 VISITS = {
     9615: {
@@ -99,17 +100,6 @@ VISITS = {
 }
 
 GEN2_RAW_ROOT = "/datasets/hsc/repo"
-GEN2_CALIB_ROOT = "/datasets/hsc/repo/CALIB"
-REFCAT_ROOT = "/datasets/refcats/htm/v1"
-BRIGHT_OBJECT_MASK_ROOT = GEN2_RAW_ROOT
-
-
-def computeFilesForVisits(visits):
-    with lsst.log.utils.temporaryLogLevel("CameraMapper", lsst.log.Log.WARN):
-        butler = Butler2(GEN2_RAW_ROOT)
-        for visit in visits:
-            for ccd in range(104):
-                yield butler.get("raw_filename", visit=visit, ccd=ccd)[0]
 
 
 def configureLogging():
@@ -122,35 +112,35 @@ log4j.appender.A1.layout.ConversionPattern=%-5p %d{yyyy-MM-ddTHH:mm:ss.SSSZ} %c 
 """)
 
 
-def makeInputs(tracts, filters):
-    instrument = HyperSuprimeCam()
-    raws = []
+def makeVisitList(tracts: List[int], filters: List[str]):
+    visits = []
     for tract in tracts:
         for filter in filters:
-            raws.extend(computeFilesForVisits(VISITS[tract][filter]))
-    return BootstrapRepoInputs(instrument=instrument, raws=raws,
-                               refCatRoot=REFCAT_ROOT,
-                               brightObjectMaskRoot=BRIGHT_OBJECT_MASK_ROOT,
-                               calibRoot=GEN2_CALIB_ROOT)
+            visits.extend(VISITS[tract][filter])
+    return visits
 
 
-def makeTask(butler):
+def makeTask(butler: Butler, *, continue_: bool = False):
     instrument = HyperSuprimeCam()
-    config = BootstrapRepoTask.ConfigClass()
-    instrument.applyConfigOverrides(BootstrapRepoTask._DefaultName, config)
-    config.raws.onError = "break"
-    config.raws.transfer = "symlink"
-    for sub in config.refCats.values():
-        sub.transfer = "symlink"
-    config.brightObjectMasks.transfer = "symlink"
-    config.calibrations.transfer = "symlink"
-    return BootstrapRepoTask(config=config, butler=butler)
+    config = ConvertRepoTask.ConfigClass()
+    instrument.applyConfigOverrides(ConvertRepoTask._DefaultName, config)
+    config.relatedOnly = True
+    config.transfer = "symlink"
+    config.rootSkyMapName = "hsc_rings_v1"
+    config.datasetIgnorePatterns.append("*_camera")
+    config.datasetIgnorePatterns.append("yBackground")
+    config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
+    config.doRegisterInstrument = not continue_
+    config.doWriteCuratedCalibrations = not continue_
+    return ConvertRepoTask(config=config, butler3=butler)
 
 
-def main(root, *, tracts, filters, create=False, clobber=False):
+def run(root: str, *, tracts: List[int], filters: List[str],
+        create: bool = False, clobber: bool = False, continue_: bool = False):
     configureLogging()
-    inputs = makeInputs(tracts, filters)
     if create:
+        if continue_:
+            raise ValueError("Cannot continue if create is True.")
         if os.path.exists(root):
             if clobber:
                 shutil.rmtree(root)
@@ -158,11 +148,21 @@ def main(root, *, tracts, filters, create=False, clobber=False):
                 raise ValueError("Repo exists and clobber=False.")
         Butler.makeRepo(root)
     butler = Butler(root, run="raw/hsc")
-    task = makeTask(butler)
-    task.run(inputs)
+    task = makeTask(butler, continue_=continue_)
+    task.run(
+        root=GEN2_RAW_ROOT,
+        collections=[],
+        calibs=({"CALIB": ["calib/hsc"]} if not continue_ else None),
+        visits=makeVisitList(tracts, filters)
+    )
+    if not continue_:
+        task.log("Ingesting y-band stray light data.")
+        task.instrument.ingestStrayLightData(Butler(root, run="calib/hsc"),
+                                             directory=os.path.join(GEN2_RAW_ROOT, "CALIB"),
+                                             transfer="symlink")
 
 
-if __name__ == "__main__":
+def main():
     import argparse
     parser = argparse.ArgumentParser(
         description="Bootstrap a Gen3 Butler data repository with HSC RC2 data."
@@ -173,6 +173,8 @@ if __name__ == "__main__":
                         help="Create the repo before attempting to populating it.")
     parser.add_argument("--clobber", action="store_true", default=False,
                         help="Remove any existing repo if --create is passed (ignored otherwise).")
+    parser.add_argument("--continue", dest="continue_", action="store_true", default=False,
+                        help="Ingest more tracts and/or filters into a repo already containing calibs.")
     parser.add_argument("--tract", type=int, action="append",
                         help=("Ingest raws from this tract (may be passed multiple times; "
                               "default is all known tracts)."))
@@ -182,4 +184,9 @@ if __name__ == "__main__":
     options = parser.parse_args()
     tracts = options.tract if options.tract else list(VISITS.keys())
     filters = options.filter if options.filter else list("grizy")
-    main(options.root, tracts=tracts, filters=filters, create=options.create, clobber=options.clobber)
+    run(options.root, tracts=tracts, filters=filters, create=options.create, clobber=options.clobber,
+        continue_=options.continue_)
+
+
+if __name__ == "__main__":
+    main()
