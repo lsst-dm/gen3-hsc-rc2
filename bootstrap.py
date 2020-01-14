@@ -158,9 +158,9 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
-        task.log("Ingesting y-band stray light data.")
+        task.log.info("Ingesting y-band stray light data.")
         task.instrument.ingestStrayLightData(Butler(root, run="calib/hsc"),
-                                             directory=os.path.join(GEN2_RAW_ROOT, "CALIB"),
+                                             directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
                                              transfer="symlink")
 
 
