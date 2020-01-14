@@ -127,6 +127,8 @@ def makeTask(butler: Butler, *, continue_: bool = False):
     config.relatedOnly = True
     config.transfer = "symlink"
     config.rootSkyMapName = "hsc_rings_v1"
+    config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
+                                     "ref_cat", "raw"]
     config.datasetIgnorePatterns.append("*_camera")
     config.datasetIgnorePatterns.append("yBackground")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
