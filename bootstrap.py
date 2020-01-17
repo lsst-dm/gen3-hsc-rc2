@@ -126,7 +126,6 @@ def makeTask(butler: Butler, *, continue_: bool = False):
     instrument.applyConfigOverrides(ConvertRepoTask._DefaultName, config)
     config.relatedOnly = True
     config.transfer = "symlink"
-    config.rootSkyMapName = "hsc_rings_v1"
     config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
                                      "ref_cat", "raw"]
     config.datasetIgnorePatterns.append("*_camera")
