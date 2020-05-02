@@ -8,7 +8,7 @@ from typing import List
 
 import lsst.log.utils
 from lsst.obs.base.gen2to3 import ConvertRepoTask
-from lsst.obs.subaru.gen3.hsc import HyperSuprimeCam
+from lsst.obs.subaru import HyperSuprimeCam
 from lsst.daf.butler import Butler
 
 VISITS = {
@@ -102,7 +102,7 @@ VISITS = {
 GEN2_RAW_ROOT = "/datasets/hsc/repo"
 
 
-def configureLogging():
+def configureLogging(level):
     lsst.log.configure_prop("""
 log4j.rootLogger=INFO, A1
 log4j.appender.A1=ConsoleAppender
@@ -110,6 +110,8 @@ log4j.appender.A1.Target=System.out
 log4j.appender.A1.layout=PatternLayout
 log4j.appender.A1.layout.ConversionPattern=%-5p %d{yyyy-MM-ddTHH:mm:ss.SSSZ} %c - %m%n
 """)
+    log = lsst.log.Log.getLogger("convertRepo")
+    log.setLevel(level)
 
 
 def makeVisitList(tracts: List[int], filters: List[str]):
@@ -138,7 +140,6 @@ def makeTask(butler: Butler, *, continue_: bool = False):
 
 def run(root: str, *, tracts: List[int], filters: List[str],
         create: bool = False, clobber: bool = False, continue_: bool = False):
-    configureLogging()
     if create:
         if continue_:
             raise ValueError("Cannot continue if create is True.")
@@ -146,14 +147,14 @@ def run(root: str, *, tracts: List[int], filters: List[str],
             if clobber:
                 shutil.rmtree(root)
             else:
-                raise ValueError("Repo exists and clobber=False.")
+                raise ValueError("Repo exists and --clobber=False.")
         Butler.makeRepo(root)
     butler = Butler(root, run="raw/hsc")
     task = makeTask(butler, continue_=continue_)
     task.run(
         root=GEN2_RAW_ROOT,
-        collections=[],
-        calibs=({"CALIB": ["calib/hsc"]} if not continue_ else None),
+        reruns=[],
+        calibs=({"CALIB": "calib/hsc"} if not continue_ else None),
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
@@ -182,9 +183,13 @@ def main():
     parser.add_argument("--filter", type=str, action="append", choices=("g", "r", "i", "z", "y"),
                         help=("Ingest raws from this filter (may be passed multiple times; "
                               "default is grizy)."))
+    parser.add_argument("-v", "--verbose", action="store_const", dest="verbose",
+                        default=lsst.log.Log.INFO, const=lsst.log.Log.DEBUG,
+                        help="Set the log level to DEBUG.")
     options = parser.parse_args()
     tracts = options.tract if options.tract else list(VISITS.keys())
     filters = options.filter if options.filter else list("grizy")
+    configureLogging(options.verbose)
     run(options.root, tracts=tracts, filters=filters, create=options.create, clobber=options.clobber,
         continue_=options.continue_)
 
