@@ -8,8 +8,10 @@ from typing import List
 
 import lsst.log.utils
 from lsst.obs.base.gen2to3 import ConvertRepoTask
+from lsst.obs.base import Instrument
 from lsst.obs.subaru import HyperSuprimeCam
-from lsst.daf.butler import Butler
+from lsst.daf.butler import Butler, DatasetType
+from lsst.pipe.tasks.makeSkyMap import MakeSkyMapTask
 
 VISITS = {
     9615: {
@@ -138,6 +140,18 @@ def makeTask(butler: Butler, *, continue_: bool = False):
     return ConvertRepoTask(config=config, butler3=butler)
 
 
+def putSkyMap(butler: Butler, instrument: Instrument):
+    datasetType = DatasetType(name="deepCoadd_skyMap", dimensions=["skymap"], storageClass="SkyMap",
+                              universe=butler.registry.dimensions)
+    butler.registry.registerDatasetType(datasetType)
+    run = "skymaps"
+    butler.registry.registerRun(run)
+    skyMapConfig = MakeSkyMapTask.ConfigClass()
+    instrument.applyConfigOverrides(MakeSkyMapTask._DefaultName, skyMapConfig)
+    skyMap = skyMapConfig.skyMap.apply()
+    butler.put(skyMap, datasetType, skymap="hsc_rings_v1", run=run)
+
+
 def run(root: str, *, tracts: List[int], filters: List[str],
         create: bool = False, clobber: bool = False, continue_: bool = False):
     if create:
@@ -162,6 +176,8 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         task.instrument.ingestStrayLightData(Butler(root, run="calib/hsc"),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
                                              transfer="symlink")
+        task.log.info("Writing deepCoadd_skyMap.")
+        putSkyMap(butler, task.instrument)
 
 
 def main():
