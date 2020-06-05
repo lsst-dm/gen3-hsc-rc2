@@ -10,7 +10,8 @@ import lsst.log.utils
 from lsst.obs.base.gen2to3 import ConvertRepoTask, Rerun
 from lsst.obs.base import Instrument
 from lsst.obs.subaru import HyperSuprimeCam
-from lsst.daf.butler import Butler, ConflictingDefinitionError, DatasetType
+from lsst.daf.butler import Butler, DatasetType
+from lsst.daf.butler.registry import ConflictingDefinitionError
 from lsst.pipe.tasks.makeSkyMap import MakeSkyMapTask
 
 VISITS = {
@@ -109,11 +110,13 @@ VISITS = {
 RERUNS = {
     "RC2/w_2020_19": [
         Rerun(
-            path="rerun/RC2/w_2020_19/DM-24822-sfm",
+            path="rerun/RC/w_2020_19/DM-24822-sfm",
             runName="RC2/w_2020_19/DM-24822/sfm",
+            chainName=None,
+            parents=[]
         ),
         Rerun(
-            path="rerun/RC2/w_2020_19/DM-24822",
+            path="rerun/RC/w_2020_19/DM-24822",
             runName="RC2/w_2020_19/DM-24822/remainder",
             chainName="RC2/w_2020_19",
             parents=["RC2/w_2020_19/DM-24822/sfm", "calib/hsc"],
@@ -151,7 +154,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     instrument.applyConfigOverrides(ConvertRepoTask._DefaultName, config)
     config.relatedOnly = True
     config.transfer = "symlink"
-    if reruns:
+    if not reruns:
         # No reruns, so just include datasets we want from the root and calib
         # repos (default is all datasets).
         config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
@@ -231,7 +234,7 @@ def main():
     parser.add_argument("--filter", type=str, action="append", choices=("g", "r", "i", "z", "y"),
                         help=("Ingest raws from this filter (may be passed multiple times; "
                               "default is grizy)."))
-    parser.add_argument("--rerun", type=str, action="append", choices=tuple(RERUNS.keys()),
+    parser.add_argument("--reruns", type=str, action="append", choices=tuple(RERUNS.keys()),
                         help=("Convert output products from this predefined set of Gen2 reruns.  "
                               "Not compatible with --filter.  May be passed multiple times."))
     parser.add_argument("-v", "--verbose", action="store_const", dest="verbose",
