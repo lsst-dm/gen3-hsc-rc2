@@ -7,10 +7,11 @@ import os
 from typing import List
 
 import lsst.log.utils
-from lsst.obs.base.gen2to3 import ConvertRepoTask
+from lsst.obs.base.gen2to3 import ConvertRepoTask, Rerun
 from lsst.obs.base import Instrument
 from lsst.obs.subaru import HyperSuprimeCam
 from lsst.daf.butler import Butler, DatasetType
+from lsst.daf.butler.registry import ConflictingDefinitionError
 from lsst.pipe.tasks.makeSkyMap import MakeSkyMapTask
 
 VISITS = {
@@ -101,6 +102,43 @@ VISITS = {
     }
 }
 
+# Specifications for known groups of reruns to be converted.  Keys are just
+# names to be used to make command-line argument parsing easier.  Convention
+# here is to make that the same as the chainName for one of the Reruns, which
+# should be the one that has all others as parents and hence includes all
+# outputs.
+RERUNS = {
+    "RC2/w_2020_19": [
+        Rerun(
+            path="rerun/RC/w_2020_19/DM-24822-sfm",
+            runName="RC2/w_2020_19/DM-24822/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_19/DM-24822",
+            runName="RC2/w_2020_19/DM-24822/remainder",
+            chainName="RC2/w_2020_19",
+            parents=["RC2/w_2020_19/DM-24822/sfm", "calib/hsc"],
+        )
+    ],
+    "RC2/w_2020_22": [
+        Rerun(
+            path="rerun/RC/w_2020_22/DM-25176-sfm",
+            runName="RC2/w_2020_22/DM-25176/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_22/DM-25176",
+            runName="RC2/w_2020_22/DM-25176/remainder",
+            chainName="RC2/w_2020_22",
+            parents=["RC2/w_2020_22/DM-25176/sfm", "calib/hsc"],
+        )
+    ],
+}
+
+
 GEN2_RAW_ROOT = "/datasets/hsc/repo"
 
 
@@ -124,14 +162,17 @@ def makeVisitList(tracts: List[int], filters: List[str]):
     return visits
 
 
-def makeTask(butler: Butler, *, continue_: bool = False):
+def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     instrument = HyperSuprimeCam()
     config = ConvertRepoTask.ConfigClass()
     instrument.applyConfigOverrides(ConvertRepoTask._DefaultName, config)
     config.relatedOnly = True
     config.transfer = "symlink"
-    config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
-                                     "ref_cat", "raw"]
+    if not reruns:
+        # No reruns, so just include datasets we want from the root and calib
+        # repos (default is all datasets).
+        config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
+                                         "ref_cat", "raw"]
     config.datasetIgnorePatterns.append("*_camera")
     config.datasetIgnorePatterns.append("yBackground")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
@@ -153,7 +194,8 @@ def putSkyMap(butler: Butler, instrument: Instrument):
 
 
 def run(root: str, *, tracts: List[int], filters: List[str],
-        create: bool = False, clobber: bool = False, continue_: bool = False):
+        create: bool = False, clobber: bool = False, continue_: bool = False,
+        reruns: List[Rerun]):
     if create:
         if continue_:
             raise ValueError("Cannot continue if create is True.")
@@ -163,11 +205,13 @@ def run(root: str, *, tracts: List[int], filters: List[str],
             else:
                 raise ValueError("Repo exists and --clobber=False.")
         Butler.makeRepo(root)
+    if reruns and set(filters) != set("grizy"):
+        raise ValueError("All filters must be included if reruns are converted.")
     butler = Butler(root, run="raw/hsc")
-    task = makeTask(butler, continue_=continue_)
+    task = makeTask(butler, continue_=continue_, reruns=reruns)
     task.run(
         root=GEN2_RAW_ROOT,
-        reruns=[],
+        reruns=reruns,
         calibs=({"CALIB": "calib/hsc"} if not continue_ else None),
         visits=makeVisitList(tracts, filters)
     )
@@ -176,8 +220,13 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         task.instrument.ingestStrayLightData(Butler(root, run="calib/hsc"),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
                                              transfer="symlink")
-        task.log.info("Writing deepCoadd_skyMap.")
-        putSkyMap(butler, task.instrument)
+        task.log.info("Writing deepCoadd_skyMap to root repo.")
+        try:
+            putSkyMap(butler, task.instrument)
+        except ConflictingDefinitionError:
+            # Presumably this skymap was converted because we found a Gen2 one;
+            # that's fine.
+            pass
 
 
 def main():
@@ -199,15 +248,21 @@ def main():
     parser.add_argument("--filter", type=str, action="append", choices=("g", "r", "i", "z", "y"),
                         help=("Ingest raws from this filter (may be passed multiple times; "
                               "default is grizy)."))
+    parser.add_argument("--reruns", type=str, action="append", choices=tuple(RERUNS.keys()),
+                        help=("Convert output products from this predefined set of Gen2 reruns.  "
+                              "Not compatible with --filter.  May be passed multiple times."))
     parser.add_argument("-v", "--verbose", action="store_const", dest="verbose",
                         default=lsst.log.Log.INFO, const=lsst.log.Log.DEBUG,
                         help="Set the log level to DEBUG.")
     options = parser.parse_args()
     tracts = options.tract if options.tract else list(VISITS.keys())
     filters = options.filter if options.filter else list("grizy")
+    reruns = []
+    for key in options.reruns:
+        reruns.extend(RERUNS[key])
     configureLogging(options.verbose)
     run(options.root, tracts=tracts, filters=filters, create=options.create, clobber=options.clobber,
-        continue_=options.continue_)
+        continue_=options.continue_, reruns=reruns)
 
 
 if __name__ == "__main__":
