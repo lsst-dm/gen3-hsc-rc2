@@ -119,7 +119,7 @@ RERUNS = {
             path="rerun/RC/w_2020_19/DM-24822",
             runName="RC2/w_2020_19/DM-24822/remainder",
             chainName="RC2/w_2020_19",
-            parents=["RC2/w_2020_19/DM-24822/sfm", "calib/hsc"],
+            parents=["RC2/w_2020_19/DM-24822/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_22": [
@@ -133,7 +133,21 @@ RERUNS = {
             path="rerun/RC/w_2020_22/DM-25176",
             runName="RC2/w_2020_22/DM-25176/remainder",
             chainName="RC2/w_2020_22",
-            parents=["RC2/w_2020_22/DM-25176/sfm", "calib/hsc"],
+            parents=["RC2/w_2020_22/DM-25176/sfm", "HSC/calib"],
+        )
+    ],
+    "RC2/v20_0_0_rc1": [
+        Rerun(
+            path="rerun/RC/v20_0_0_rc1/DM-25349-sfm",
+            runName="RC2/v20_0_0_rc1/DM-25349/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/v20_0_0_rc1/DM-25349",
+            runName="RC2/v20_0_0_rc1/DM-25349/remainder",
+            chainName="RC2/v20_0_0_rc1",
+            parents=["RC2/v20_0_0_rc1/DM-25349/sfm", "HSC/calib"],
         )
     ],
 }
@@ -207,17 +221,17 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         Butler.makeRepo(root)
     if reruns and set(filters) != set("grizy"):
         raise ValueError("All filters must be included if reruns are converted.")
-    butler = Butler(root, run="raw/hsc")
+    butler = Butler(root, run="HSC/raw/all")
     task = makeTask(butler, continue_=continue_, reruns=reruns)
     task.run(
         root=GEN2_RAW_ROOT,
         reruns=reruns,
-        calibs=({"CALIB": "calib/hsc"} if not continue_ else None),
+        calibs=({"CALIB": "HSC/calib"} if not continue_ else None),
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
         task.log.info("Ingesting y-band stray light data.")
-        task.instrument.ingestStrayLightData(Butler(root, run="calib/hsc"),
+        task.instrument.ingestStrayLightData(Butler(root, run="HSC/calib"),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
                                              transfer="symlink")
         task.log.info("Writing deepCoadd_skyMap to root repo.")
