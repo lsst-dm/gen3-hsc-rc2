@@ -6,6 +6,11 @@ inherits:
     exclude:
       - forcedPhotCcd
 tasks:
+  isr:
+    class: lsst.ip.isr.IsrTask
+    config:
+      doFringe: False
+      doStrayLight: False
   makeWarpTask:
     class: lsst.pipe.tasks.makeCoaddTempExp.MakeWarpTask
     config:
