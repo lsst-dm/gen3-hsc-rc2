@@ -272,8 +272,9 @@ def main():
     tracts = options.tract if options.tract else list(VISITS.keys())
     filters = options.filter if options.filter else list("grizy")
     reruns = []
-    for key in options.reruns:
-        reruns.extend(RERUNS[key])
+    if options.reruns is not None:
+        for key in options.reruns:
+            reruns.extend(RERUNS[key])
     configureLogging(options.verbose)
     run(options.root, tracts=tracts, filters=filters, create=options.create, clobber=options.clobber,
         continue_=options.continue_, reruns=reruns)
