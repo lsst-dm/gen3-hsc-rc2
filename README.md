@@ -36,17 +36,17 @@ Using the Data Repository
 The `bootstrap.py` script produces a repo with the following
 collections:
 
- - `HSC/calibs/default`
+ - `HSC/calib`
  - `HSC/raw/all`
  - `skymaps`
  - `HSC/masks`
- - `refcats/ps1_pv3`
+ - `refcats`
 
 To improve preflight performance (by simplifying the queries involved), it
 may be useful to explicitly state which collections should be used to obtain
 instances of particular dataset types.  For example, pipelines that include ISR would pass
 ```
-'flat:HSC/calibs/default','dark:HSC/calibs/default','bias:HSC/calibs/default','camera:HSC/calibs/default','bfKernel:HSC/calibs/default','defects:HSC/calibs/default','transmission_optics:HSC/calibs/default','transmission_filter:HSC/calibs/default','transmission_sensor:HSC/calibs/default','transmission_atmosphere:HSC/calibs/default','HSC/raw'
+'flat:HSC/calib','dark:HSC/calib','bias:HSC/calib','camera:HSC/calib','bfKernel:HSC/calib','defects:HSC/calib','transmission_optics:HSC/calib','transmission_filter:HSC/calib','transmission_sensor:HSC/calib','transmission_atmosphere:HSC/calib','HSC/raw'
 ```
 as the `-i` argument to `pipetask`.
 
