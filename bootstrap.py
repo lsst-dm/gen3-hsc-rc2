@@ -206,7 +206,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
     config.doWriteCuratedCalibrations = not continue_
-    return ConvertRepoTask(config=config, butler3=butler)
+    return ConvertRepoTask(config=config, butler3=butler, instrument=instrument)
 
 
 def putSkyMap(butler: Butler, instrument: Instrument):
