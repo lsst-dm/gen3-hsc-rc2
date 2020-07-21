@@ -195,7 +195,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config = ConvertRepoTask.ConfigClass()
     instrument.applyConfigOverrides(ConvertRepoTask._DefaultName, config)
     config.relatedOnly = True
-    config.transfer = "symlink"
+    config.transfer = "auto"
     if not reruns:
         # No reruns, so just include datasets we want from the root and calib
         # repos (default is all datasets).
@@ -247,7 +247,7 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         task.log.info("Ingesting y-band stray light data.")
         task.instrument.ingestStrayLightData(Butler(root, run="HSC/calib"),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
-                                             transfer="symlink")
+                                             transfer="auto")
         task.log.info("Writing deepCoadd_skyMap to root repo.")
         try:
             putSkyMap(butler, task.instrument)
