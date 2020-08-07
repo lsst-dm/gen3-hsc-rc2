@@ -108,7 +108,7 @@ VISITS = {
 # should be the one that has all others as parents and hence includes all
 # outputs.
 RERUNS = {
-    "RC2/w_2020_30": [
+    "RC2/w_2020_19": [
         Rerun(
             path="rerun/RC/w_2020_19/DM-24822-sfm",
             runName="RC2/w_2020_19/DM-24822/sfm",
