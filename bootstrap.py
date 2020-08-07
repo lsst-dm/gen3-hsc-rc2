@@ -164,6 +164,20 @@ RERUNS = {
             parents=["RC2/w_2020_26/DM-25714/sfm", "HSC/calib"],
         )
     ],
+    "RC2/w_2020_30": [
+        Rerun(
+            path="rerun/RC/w_2020_30/DM-26105-sfm",
+            runName="RC2/w_2020_30/DM-26105/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_30/DM-26105",
+            runName="RC2/w_2020_30/DM-26105/remainder",
+            chainName="RC2/w_2020_30",
+            parents=["RC2/w_2020_30/DM-26105/sfm", "HSC/calib"],
+        )
+    ],
 }
 
 
@@ -206,7 +220,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
     config.doWriteCuratedCalibrations = not continue_
-    return ConvertRepoTask(config=config, butler3=butler)
+    return ConvertRepoTask(config=config, butler3=butler, instrument=instrument)
 
 
 def putSkyMap(butler: Butler, instrument: Instrument):
