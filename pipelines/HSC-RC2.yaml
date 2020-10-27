@@ -10,10 +10,10 @@ tasks:
     class: lsst.pipe.tasks.makeCoaddTempExp.MakeWarpTask
     config:
       matchingKernelSize: 29
-      makePsfMatched: True
+      makePsfMatched: true
       modelPsf.defaultFwhm: 7.7
-      doApplyExternalPhotoCalib: False
-      doApplyExternalSkyWcs: False
-      doApplySkyCorr: False
-      doWriteEmptyWarps: True
+      doApplyExternalPhotoCalib: false
+      doApplyExternalSkyWcs: false
+      doApplySkyCorr: false
+      doWriteEmptyWarps: true
       python: config.warpAndPsfMatch.psfMatch.kernel['AL'].alardSigGauss = [1.0, 2.0, 4.5]
