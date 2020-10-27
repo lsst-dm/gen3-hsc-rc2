@@ -246,6 +246,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
                                          "ref_cat", "raw"]
     config.datasetIgnorePatterns.append("*_camera")
     config.datasetIgnorePatterns.append("yBackground")
+    config.datasetIgnorePatterns.append("fgcmLookUpTable")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
     config.doWriteCuratedCalibrations = not continue_
