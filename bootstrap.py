@@ -206,7 +206,34 @@ RERUNS = {
             parents=["RC2/w_2020_36/DM-26637/sfm", "HSC/calib"],
         )
     ],
-
+    "RC2/w_2020_38": [
+        Rerun(
+            path="rerun/RC/w_2020_38/DM-26820-sfm",
+            runName="RC2/w_2020_38/DM-26820/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_38/DM-26820",
+            runName="RC2/w_2020_38/DM-26820/remainder",
+            chainName="RC2/w_2020_38",
+            parents=["RC2/w_2020_38/DM-26820/sfm", "HSC/calib"],
+        )
+    ],
+    "RC2/w_2020_42": [
+        Rerun(
+            path="rerun/RC/w_2020_42/DM-27244-sfm",
+            runName="RC2/w_2020_42/DM-27244/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_42/DM-27244",
+            runName="RC2/w_2020_42/DM-27244/remainder",
+            chainName="RC2/w_2020_42",
+            parents=["RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
+        )
+    ],
 }
 
 
