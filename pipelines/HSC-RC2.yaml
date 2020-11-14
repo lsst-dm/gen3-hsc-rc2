@@ -2,18 +2,6 @@ description: HSC RC2
 instrument: lsst.obs.subaru.HyperSuprimeCam
 inherits:
   -
-    location: $PIPE_TASKS_DIR/pipelines/DataReleaseProduction.yaml
+    location: $OBS_SUBARU_DIR/pipelines/DataReleaseProduction.yaml
     exclude:
       - forcedPhotCcd
-tasks:
-  makeWarpTask:
-    class: lsst.pipe.tasks.makeCoaddTempExp.MakeWarpTask
-    config:
-      matchingKernelSize: 29
-      makePsfMatched: true
-      modelPsf.defaultFwhm: 7.7
-      doApplyExternalPhotoCalib: false
-      doApplyExternalSkyWcs: false
-      doApplySkyCorr: false
-      doWriteEmptyWarps: true
-      python: config.warpAndPsfMatch.psfMatch.kernel['AL'].alardSigGauss = [1.0, 2.0, 4.5]
