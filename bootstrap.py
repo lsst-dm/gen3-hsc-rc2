@@ -7,12 +7,9 @@ import os
 from typing import List
 
 import lsst.log.utils
-from lsst.obs.base.gen2to3 import ConvertRepoTask, Rerun
-from lsst.obs.base import Instrument
+from lsst.obs.base.gen2to3 import CalibRepo, ConvertRepoTask, Rerun
 from lsst.obs.subaru import HyperSuprimeCam
-from lsst.daf.butler import Butler, DatasetType
-from lsst.daf.butler.registry import ConflictingDefinitionError
-from lsst.pipe.tasks.makeSkyMap import MakeSkyMapTask
+from lsst.daf.butler import Butler
 
 VISITS = {
     9615: {
@@ -276,20 +273,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config.datasetIgnorePatterns.append("fgcmLookUpTable")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
-    config.doWriteCuratedCalibrations = not continue_
     return ConvertRepoTask(config=config, butler3=butler, instrument=instrument)
-
-
-def putSkyMap(butler: Butler, instrument: Instrument):
-    datasetType = DatasetType(name="deepCoadd_skyMap", dimensions=["skymap"], storageClass="SkyMap",
-                              universe=butler.registry.dimensions)
-    butler.registry.registerDatasetType(datasetType)
-    run = "skymaps"
-    butler.registry.registerRun(run)
-    skyMapConfig = MakeSkyMapTask.ConfigClass()
-    instrument.applyConfigOverrides(MakeSkyMapTask._DefaultName, skyMapConfig)
-    skyMap = skyMapConfig.skyMap.apply()
-    butler.put(skyMap, datasetType, skymap="hsc_rings_v1", run=run)
 
 
 def run(root: str, *, tracts: List[int], filters: List[str],
@@ -311,21 +295,15 @@ def run(root: str, *, tracts: List[int], filters: List[str],
     task.run(
         root=GEN2_RAW_ROOT,
         reruns=reruns,
-        calibs=({"CALIB": "HSC/calib"} if not continue_ else None),
+        calibs=([CalibRepo(path="CALIB", labels=("defaults",))] if not continue_ else []),
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
         task.log.info("Ingesting y-band stray light data.")
-        task.instrument.ingestStrayLightData(Butler(root, run="HSC/calib"),
+        task.instrument.ingestStrayLightData(Butler(root, writeable=True),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
-                                             transfer="symlink")
-        task.log.info("Writing deepCoadd_skyMap to root repo.")
-        try:
-            putSkyMap(butler, task.instrument)
-        except ConflictingDefinitionError:
-            # Presumably this skymap was converted because we found a Gen2 one;
-            # that's fine.
-            pass
+                                             transfer=task.config.transfer,
+                                             labels=("defaults",))
 
 
 def main():
