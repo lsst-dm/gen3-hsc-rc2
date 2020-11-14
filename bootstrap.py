@@ -108,29 +108,29 @@ RERUNS = {
     "RC2/w_2020_19": [
         Rerun(
             path="rerun/RC/w_2020_19/DM-24822-sfm",
-            runName="RC2/w_2020_19/DM-24822/sfm",
+            runName="HSC/runs/RC2/w_2020_19/DM-24822/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_19/DM-24822",
-            runName="RC2/w_2020_19/DM-24822/remainder",
-            chainName="RC2/w_2020_19",
-            parents=["RC2/w_2020_19/DM-24822/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_19/DM-24822/remainder",
+            chainName="HSC/runs/RC2/w_2020_19",
+            parents=["HSC/runs/RC2/w_2020_19/DM-24822/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_22": [
         Rerun(
             path="rerun/RC/w_2020_22/DM-25176-sfm",
-            runName="RC2/w_2020_22/DM-25176/sfm",
+            runName="HSC/runs/RC2/w_2020_22/DM-25176/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_22/DM-25176",
-            runName="RC2/w_2020_22/DM-25176/remainder",
-            chainName="RC2/w_2020_22",
-            parents=["RC2/w_2020_22/DM-25176/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_22/DM-25176/remainder",
+            chainName="HSC/runs/RC2/w_2020_22",
+            parents=["HSC/runs/RC2/w_2020_22/DM-25176/sfm", "HSC/calib"],
         )
     ],
     "RC2/v20_0_0_rc1": [
@@ -150,85 +150,85 @@ RERUNS = {
     "RC2/w_2020_26": [
         Rerun(
             path="rerun/RC/w_2020_26/DM-25714-sfm",
-            runName="RC2/w_2020_26/DM-25714/sfm",
+            runName="HSC/runs/RC2/w_2020_26/DM-25714/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_26/DM-25714",
-            runName="RC2/w_2020_26/DM-25714/remainder",
-            chainName="RC2/w_2020_26",
-            parents=["RC2/w_2020_26/DM-25714/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_26/DM-25714/remainder",
+            chainName="HSC/runs/RC2/w_2020_26",
+            parents=["HSC/runs/RC2/w_2020_26/DM-25714/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_30": [
         Rerun(
             path="rerun/RC/w_2020_30/DM-26105-sfm",
-            runName="RC2/w_2020_30/DM-26105/sfm",
+            runName="HSC/runs/RC2/w_2020_30/DM-26105/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_30/DM-26105",
-            runName="RC2/w_2020_30/DM-26105/remainder",
-            chainName="RC2/w_2020_30",
-            parents=["RC2/w_2020_30/DM-26105/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_30/DM-26105/remainder",
+            chainName="HSC/runs/RC2/w_2020_30",
+            parents=["HSC/runs/RC2/w_2020_30/DM-26105/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_34": [
         Rerun(
             path="rerun/RC/w_2020_34/DM-26441-sfm",
-            runName="RC2/w_2020_34/DM-26441/sfm",
+            runName="HSC/runs/RC2/w_2020_34/DM-26441/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_34/DM-26441",
-            runName="RC2/w_2020_34/DM-26441/remainder",
-            chainName="RC2/w_2020_34",
-            parents=["RC2/w_2020_34/DM-26441/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_34/DM-26441/remainder",
+            chainName="HSC/runs/RC2/w_2020_34",
+            parents=["HSC/runs/RC2/w_2020_34/DM-26441/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_36": [
         Rerun(
             path="rerun/RC/w_2020_36/DM-26637-sfm",
-            runName="RC2/w_2020_36/DM-26637/sfm",
+            runName="HSC/runs/RC2/w_2020_36/DM-26637/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_36/DM-26637",
-            runName="RC2/w_2020_36/DM-26637/remainder",
-            chainName="RC2/w_2020_36",
-            parents=["RC2/w_2020_36/DM-26637/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_36/DM-26637/remainder",
+            chainName="HSC/runs/RC2/w_2020_36",
+            parents=["HSC/runs/RC2/w_2020_36/DM-26637/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_38": [
         Rerun(
             path="rerun/RC/w_2020_38/DM-26820-sfm",
-            runName="RC2/w_2020_38/DM-26820/sfm",
+            runName="HSC/runs/RC2/w_2020_38/DM-26820/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_38/DM-26820",
-            runName="RC2/w_2020_38/DM-26820/remainder",
-            chainName="RC2/w_2020_38",
-            parents=["RC2/w_2020_38/DM-26820/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_38/DM-26820/remainder",
+            chainName="HSC/runs/RC2/w_2020_38",
+            parents=["HSC/runs/RC2/w_2020_38/DM-26820/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_42": [
         Rerun(
             path="rerun/RC/w_2020_42/DM-27244-sfm",
-            runName="RC2/w_2020_42/DM-27244/sfm",
+            runName="HSC/runs/RC2/w_2020_42/DM-27244/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_42/DM-27244",
-            runName="RC2/w_2020_42/DM-27244/remainder",
-            chainName="RC2/w_2020_42",
-            parents=["RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_42/DM-27244/remainder",
+            chainName="HSC/runs/RC2/w_2020_42",
+            parents=["HSC/runs/RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
         )
     ],
 }
