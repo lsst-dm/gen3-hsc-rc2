@@ -295,7 +295,7 @@ def run(root: str, *, tracts: List[int], filters: List[str],
     task.run(
         root=GEN2_RAW_ROOT,
         reruns=reruns,
-        calibs=([CalibRepo(path="CALIB", labels=("defaults",))] if not continue_ else []),
+        calibs=([CalibRepo(path="CALIB", labels=("gen2", "defaults"))] if not continue_ else []),
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
@@ -303,7 +303,7 @@ def run(root: str, *, tracts: List[int], filters: List[str],
         task.instrument.ingestStrayLightData(Butler(root, writeable=True),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
                                              transfer=task.config.transfer,
-                                             labels=("defaults",))
+                                             labels=("gen2", "defaults"))
 
 
 def main():
