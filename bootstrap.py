@@ -9,7 +9,7 @@ from typing import List
 import lsst.log.utils
 from lsst.obs.base.gen2to3 import CalibRepo, ConvertRepoTask, Rerun
 from lsst.obs.subaru import HyperSuprimeCam
-from lsst.daf.butler import Butler
+from lsst.daf.butler import Butler, CollectionType
 
 VISITS = {
     9615: {
@@ -273,6 +273,15 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config.datasetIgnorePatterns.append("fgcmLookUpTable")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
+
+    # Add a level of indirection to the collection that will hold bright object
+    # masks, so the repo can hold multiple versions of those.
+    defaultMaskCollection = instrument.makeCollectionName("masks")
+    s18aMaskCollection = instrument.makeCollectionName("masks", "S18A")
+    config.runsForced["brightObjectMask"] = s18aMaskCollection
+    butler.registry.registerRun(s18aMaskCollection)
+    butler.registry.registerCollection(defaultMaskCollection, CollectionType.CHAINED)
+    butler.registry.setCollectionChain(defaultMaskCollection, [s18aMaskCollection])
     return ConvertRepoTask(config=config, butler3=butler, instrument=instrument)
 
 
