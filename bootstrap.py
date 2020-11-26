@@ -7,12 +7,9 @@ import os
 from typing import List
 
 import lsst.log.utils
-from lsst.obs.base.gen2to3 import ConvertRepoTask, Rerun
-from lsst.obs.base import Instrument
+from lsst.obs.base.gen2to3 import CalibRepo, ConvertRepoTask, Rerun
 from lsst.obs.subaru import HyperSuprimeCam
-from lsst.daf.butler import Butler, DatasetType
-from lsst.daf.butler.registry import ConflictingDefinitionError
-from lsst.pipe.tasks.makeSkyMap import MakeSkyMapTask
+from lsst.daf.butler import Butler, CollectionType
 
 VISITS = {
     9615: {
@@ -111,29 +108,29 @@ RERUNS = {
     "RC2/w_2020_19": [
         Rerun(
             path="rerun/RC/w_2020_19/DM-24822-sfm",
-            runName="RC2/w_2020_19/DM-24822/sfm",
+            runName="HSC/runs/RC2/w_2020_19/DM-24822/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_19/DM-24822",
-            runName="RC2/w_2020_19/DM-24822/remainder",
-            chainName="RC2/w_2020_19",
-            parents=["RC2/w_2020_19/DM-24822/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_19/DM-24822/remainder",
+            chainName="HSC/runs/RC2/w_2020_19",
+            parents=["HSC/runs/RC2/w_2020_19/DM-24822/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_22": [
         Rerun(
             path="rerun/RC/w_2020_22/DM-25176-sfm",
-            runName="RC2/w_2020_22/DM-25176/sfm",
+            runName="HSC/runs/RC2/w_2020_22/DM-25176/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_22/DM-25176",
-            runName="RC2/w_2020_22/DM-25176/remainder",
-            chainName="RC2/w_2020_22",
-            parents=["RC2/w_2020_22/DM-25176/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_22/DM-25176/remainder",
+            chainName="HSC/runs/RC2/w_2020_22",
+            parents=["HSC/runs/RC2/w_2020_22/DM-25176/sfm", "HSC/calib"],
         )
     ],
     "RC2/v20_0_0_rc1": [
@@ -153,85 +150,85 @@ RERUNS = {
     "RC2/w_2020_26": [
         Rerun(
             path="rerun/RC/w_2020_26/DM-25714-sfm",
-            runName="RC2/w_2020_26/DM-25714/sfm",
+            runName="HSC/runs/RC2/w_2020_26/DM-25714/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_26/DM-25714",
-            runName="RC2/w_2020_26/DM-25714/remainder",
-            chainName="RC2/w_2020_26",
-            parents=["RC2/w_2020_26/DM-25714/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_26/DM-25714/remainder",
+            chainName="HSC/runs/RC2/w_2020_26",
+            parents=["HSC/runs/RC2/w_2020_26/DM-25714/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_30": [
         Rerun(
             path="rerun/RC/w_2020_30/DM-26105-sfm",
-            runName="RC2/w_2020_30/DM-26105/sfm",
+            runName="HSC/runs/RC2/w_2020_30/DM-26105/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_30/DM-26105",
-            runName="RC2/w_2020_30/DM-26105/remainder",
-            chainName="RC2/w_2020_30",
-            parents=["RC2/w_2020_30/DM-26105/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_30/DM-26105/remainder",
+            chainName="HSC/runs/RC2/w_2020_30",
+            parents=["HSC/runs/RC2/w_2020_30/DM-26105/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_34": [
         Rerun(
             path="rerun/RC/w_2020_34/DM-26441-sfm",
-            runName="RC2/w_2020_34/DM-26441/sfm",
+            runName="HSC/runs/RC2/w_2020_34/DM-26441/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_34/DM-26441",
-            runName="RC2/w_2020_34/DM-26441/remainder",
-            chainName="RC2/w_2020_34",
-            parents=["RC2/w_2020_34/DM-26441/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_34/DM-26441/remainder",
+            chainName="HSC/runs/RC2/w_2020_34",
+            parents=["HSC/runs/RC2/w_2020_34/DM-26441/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_36": [
         Rerun(
             path="rerun/RC/w_2020_36/DM-26637-sfm",
-            runName="RC2/w_2020_36/DM-26637/sfm",
+            runName="HSC/runs/RC2/w_2020_36/DM-26637/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_36/DM-26637",
-            runName="RC2/w_2020_36/DM-26637/remainder",
-            chainName="RC2/w_2020_36",
-            parents=["RC2/w_2020_36/DM-26637/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_36/DM-26637/remainder",
+            chainName="HSC/runs/RC2/w_2020_36",
+            parents=["HSC/runs/RC2/w_2020_36/DM-26637/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_38": [
         Rerun(
             path="rerun/RC/w_2020_38/DM-26820-sfm",
-            runName="RC2/w_2020_38/DM-26820/sfm",
+            runName="HSC/runs/RC2/w_2020_38/DM-26820/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_38/DM-26820",
-            runName="RC2/w_2020_38/DM-26820/remainder",
-            chainName="RC2/w_2020_38",
-            parents=["RC2/w_2020_38/DM-26820/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_38/DM-26820/remainder",
+            chainName="HSC/runs/RC2/w_2020_38",
+            parents=["HSC/runs/RC2/w_2020_38/DM-26820/sfm", "HSC/calib"],
         )
     ],
     "RC2/w_2020_42": [
         Rerun(
             path="rerun/RC/w_2020_42/DM-27244-sfm",
-            runName="RC2/w_2020_42/DM-27244/sfm",
+            runName="HSC/runs/RC2/w_2020_42/DM-27244/sfm",
             chainName=None,
             parents=[]
         ),
         Rerun(
             path="rerun/RC/w_2020_42/DM-27244",
-            runName="RC2/w_2020_42/DM-27244/remainder",
-            chainName="RC2/w_2020_42",
-            parents=["RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
+            runName="HSC/runs/RC2/w_2020_42/DM-27244/remainder",
+            chainName="HSC/runs/RC2/w_2020_42",
+            parents=["HSC/runs/RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
         )
     ],
 }
@@ -276,20 +273,16 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
     config.datasetIgnorePatterns.append("fgcmLookUpTable")
     config.fileIgnorePatterns.extend(["*.log", "*.png", "rerun*"])
     config.doRegisterInstrument = not continue_
-    config.doWriteCuratedCalibrations = not continue_
+
+    # Add a level of indirection to the collection that will hold bright object
+    # masks, so the repo can hold multiple versions of those.
+    defaultMaskCollection = instrument.makeCollectionName("masks")
+    s18aMaskCollection = instrument.makeCollectionName("masks", "S18A")
+    config.runsForced["brightObjectMask"] = s18aMaskCollection
+    butler.registry.registerRun(s18aMaskCollection)
+    butler.registry.registerCollection(defaultMaskCollection, CollectionType.CHAINED)
+    butler.registry.setCollectionChain(defaultMaskCollection, [s18aMaskCollection])
     return ConvertRepoTask(config=config, butler3=butler, instrument=instrument)
-
-
-def putSkyMap(butler: Butler, instrument: Instrument):
-    datasetType = DatasetType(name="deepCoadd_skyMap", dimensions=["skymap"], storageClass="SkyMap",
-                              universe=butler.registry.dimensions)
-    butler.registry.registerDatasetType(datasetType)
-    run = "skymaps"
-    butler.registry.registerRun(run)
-    skyMapConfig = MakeSkyMapTask.ConfigClass()
-    instrument.applyConfigOverrides(MakeSkyMapTask._DefaultName, skyMapConfig)
-    skyMap = skyMapConfig.skyMap.apply()
-    butler.put(skyMap, datasetType, skymap="hsc_rings_v1", run=run)
 
 
 def run(root: str, *, tracts: List[int], filters: List[str],
@@ -311,21 +304,15 @@ def run(root: str, *, tracts: List[int], filters: List[str],
     task.run(
         root=GEN2_RAW_ROOT,
         reruns=reruns,
-        calibs=({"CALIB": "HSC/calib"} if not continue_ else None),
+        calibs=([CalibRepo(path="CALIB", labels=("gen2", "defaults"))] if not continue_ else []),
         visits=makeVisitList(tracts, filters)
     )
     if not continue_:
         task.log.info("Ingesting y-band stray light data.")
-        task.instrument.ingestStrayLightData(Butler(root, run="HSC/calib"),
+        task.instrument.ingestStrayLightData(Butler(root, writeable=True),
                                              directory=os.path.join(GEN2_RAW_ROOT, "CALIB", "STRAY_LIGHT"),
-                                             transfer="symlink")
-        task.log.info("Writing deepCoadd_skyMap to root repo.")
-        try:
-            putSkyMap(butler, task.instrument)
-        except ConflictingDefinitionError:
-            # Presumably this skymap was converted because we found a Gen2 one;
-            # that's fine.
-            pass
+                                             transfer=task.config.transfer,
+                                             labels=("gen2", "defaults"))
 
 
 def main():
