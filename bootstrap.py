@@ -231,6 +231,21 @@ RERUNS = {
             parents=["HSC/runs/RC2/w_2020_42/DM-27244/sfm", "HSC/calib"],
         )
     ],
+    "RC/v21_0_0_rc1": [
+        Rerun(
+            path="rerun/RC/v21_0_0_rc1/DM-27597-sfm",
+            runName="HSC/runs/RC2/v21_0_0_rc1/DM-27597/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/v21_0_0_rc1/DM-27597",
+            runName="HSC/runs/RC2/v21_0_0_rc1/DM-27597/remainder",
+            chainName="HSC/runs/RC2/v21_0_0_rc1",
+            parents=["HSC/runs/RC2/v21_0_0_rc1/DM-27597/sfm", "HSC/calib"],
+        )
+    ],
+
 }
 
 
