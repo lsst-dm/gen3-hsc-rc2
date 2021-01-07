@@ -283,6 +283,9 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
         # repos (default is all datasets).
         config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
                                          "ref_cat", "raw"]
+    gaiaRefCat = "gaia_dr2_20200414"
+    if gaiaRefCat not in config.refcats:
+        config.refCats.append(gaiaRefCat)
     config.datasetIgnorePatterns.append("*_camera")
     config.datasetIgnorePatterns.append("yBackground")
     config.datasetIgnorePatterns.append("fgcmLookUpTable")
