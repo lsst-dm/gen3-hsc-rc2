@@ -246,6 +246,20 @@ RERUNS = {
         )
     ],
 
+    "RC2/w_2020_50": [
+        Rerun(
+            path="rerun/RC/w_2020_50/DM-28140-sfm",
+            runName="HSC/runs/RC2/w_2020_50/DM-28140/sfm",
+            chainName=None,
+            parents=[]
+        ),
+        Rerun(
+            path="rerun/RC/w_2020_50/DM-28140",
+            runName="HSC/runs/RC2/w_2020_50/DM-28140/remainder",
+            chainName="HSC/runs/RC2/w_2020_50",
+            parents=["HSC/runs/RC2/w_2020_50/DM-28140/sfm", "HSC/calib"],
+        )
+    ],
 }
 
 
@@ -284,7 +298,7 @@ def makeTask(butler: Butler, *, continue_: bool = False, reruns: List[Rerun]):
         config.datasetIncludePatterns = ["brightObjectMask", "flat", "bias", "dark", "fringe", "sky",
                                          "ref_cat", "raw"]
     gaiaRefCat = "gaia_dr2_20200414"
-    if gaiaRefCat not in config.refcats:
+    if gaiaRefCat not in config.refCats:
         config.refCats.append(gaiaRefCat)
     config.datasetIgnorePatterns.append("*_camera")
     config.datasetIgnorePatterns.append("yBackground")
